@@ -3,7 +3,7 @@
 # but we expose PORT=3000 for the keep-alive health server).
 
 services:
-  - type: worker
+  - type: web
     name: discord-security-bot
     runtime: node
     plan: free
