@@ -4,7 +4,7 @@ import { config } from './config/index';
 import { connectDatabase, disconnectDatabase } from './database/client';
 import { startHealthServer } from './services/healthServer';
 import { clearAllTimers } from './services/voiceMonitor';
-import type { BotClient, Command } from './types/index';
+import type { BotClient, Command, Event } from './types/index';
 import { logger } from './utils/logger';
 
 import pingCommand from './commands/ping';
