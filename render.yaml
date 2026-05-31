@@ -10,7 +10,6 @@ services:
     region: oregon
     buildCommand: npm ci && npx prisma generate && npm run build && npx prisma db push
     startCommand: node dist/index.js
-    healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
@@ -32,8 +31,4 @@ services:
       - key: ALERT_DELAY_SECONDS
         value: 60
       - key: DATABASE_URL
-        value: file:./data/bot.db
-    disk:
-      name: bot-data
-      mountPath: /opt/render/project/src/data
-      sizeGB: 1
+        value: file:./bot.db
