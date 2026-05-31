@@ -1,0 +1,39 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Deploy this bot as a Background Worker (no HTTP port needed for the bot itself,
+# but we expose PORT=3000 for the keep-alive health server).
+
+services:
+  - type: worker
+    name: discord-security-bot
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci && npx prisma generate && npm run build && npx prisma db push
+    startCommand: node dist/index.js
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: LOG_PRETTY
+        value: false
+      - key: PORT
+        value: 3000
+      # Set these in the Render dashboard — do NOT commit secrets:
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: DISCORD_CLIENT_ID
+        sync: false
+      - key: DISCORD_GUILD_ID
+        sync: false
+      - key: ALERT_CHANNEL_ID
+        sync: false
+      - key: ALERT_DELAY_SECONDS
+        value: 60
+      - key: DATABASE_URL
+        value: file:./data/bot.db
+    disk:
+      name: bot-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

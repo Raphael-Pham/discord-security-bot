@@ -1,0 +1,58 @@
+// Prisma schema for Discord Security Bot
+// Supports SQLite (dev) and PostgreSQL (prod) via DATABASE_URL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Persisted voice sessions ──────────────────────────────────────────────────
+// A row exists for every session that was active when the bot last ran.
+// On restart the bot reads these rows and resumes monitoring.
+model VoiceSession {
+  id            String   @id @default(cuid())
+  guildId       String
+  channelId     String
+  channelName   String
+  startedAt     DateTime @default(now())
+  alertSentAt   DateTime?
+  alertSent     Boolean  @default(false)
+  userIds       String   // JSON array of user IDs — SQLite has no native array type
+  updatedAt     DateTime @updatedAt
+
+  @@unique([guildId, channelId])
+  @@index([guildId])
+}
+
+// ── Audit log for every alert that was dispatched ────────────────────────────
+model AlertLog {
+  id            String   @id @default(cuid())
+  guildId       String
+  guildName     String
+  channelId     String
+  channelName   String
+  userIds       String   // JSON array
+  userNames     String   // JSON array
+  durationMs    Int
+  sentAt        DateTime @default(now())
+  messageId     String?  // Discord message ID of the alert
+
+  @@index([guildId])
+  @@index([sentAt])
+}
+
+// ── Per-guild bot configuration (future extensibility) ───────────────────────
+model GuildConfig {
+  id                 String  @id @default(cuid())
+  guildId            String  @unique
+  alertChannelId     String?
+  alertDelaySeconds  Int     @default(60)
+  ignoredChannelIds  String  @default("[]") // JSON array
+  ignoredRoleIds     String  @default("[]")
+  ignoredUserIds     String  @default("[]")
+  updatedAt          DateTime @updatedAt
+}
