@@ -81,8 +81,8 @@ process.on('SIGINT', () => shutdown('SIGINT'));
 async function main(): Promise<void> {
   logger.info('Starting Discord Security Bot…');
 
+  startHealthServer(client);
   await connectDatabase();
-  startHealthServer();
 
   await client.login(config.token);
 }
